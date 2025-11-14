@@ -7,7 +7,6 @@ import {
 import { Box, Container, Stack } from "@mui/material";
 
 import { useTasksContext } from "@/context/TasksContext";
-import { useUser } from "@/hooks/useUser";
 
 import UndoSnackbar from "@/components/UndoSnackbar";
 import TaskTable from "@/components/TaskTable";
@@ -30,7 +29,6 @@ function AppContent() {
   const [q, setQ] = useState("");
   const [fStatus, setFStatus] = useState<string>("All");
   const [fPriority, setFPriority] = useState<string>("All");
-  const { user } = useUser();
 
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
