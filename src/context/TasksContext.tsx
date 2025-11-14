@@ -13,19 +13,24 @@ interface TasksContextValue {
   updateTask: (id: string, patch: Partial<Task>) => void;
   deleteTask: (id: string) => void;
   undoDelete: () => void;
+  clearLastDeleted: () => void;    // REQUIRED FOR BUG 2 FIX
 }
 
 const TasksContext = createContext<TasksContextValue | undefined>(undefined);
 
 export function TasksProvider({ children }: { children: ReactNode }) {
-  const value = useTasks();
-  return <TasksContext.Provider value={value}>{children}</TasksContext.Provider>;
+  const value = useTasks();  // includes clearLastDeleted now
+  return (
+    <TasksContext.Provider value={value}>
+      {children}
+    </TasksContext.Provider>
+  );
 }
 
 export function useTasksContext(): TasksContextValue {
   const ctx = useContext(TasksContext);
-  if (!ctx) throw new Error('useTasksContext must be used within TasksProvider');
-  return ctx as TasksContextValue;
+  if (!ctx) {
+    throw new Error('useTasksContext must be used within TasksProvider');
+  }
+  return ctx;
 }
-
-
