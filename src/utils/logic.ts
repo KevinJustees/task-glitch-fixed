@@ -1,19 +1,17 @@
 import { DerivedTask, Task } from '@/types';
 
-// ⭐ FIXED: SAFE ROI CALCULATION (Bug 5)
+// Safe ROI calculation
 export function computeROI(revenue: number, timeTaken: number): number {
   const r = Number(revenue);
   const t = Number(timeTaken);
 
-  // Invalid revenue or invalid time → safe fallback
   if (!r || !t || isNaN(r) || isNaN(t) || t <= 0) return 0;
 
   const roi = r / t;
 
-  // Prevent Infinity / NaN
   if (!isFinite(roi)) return 0;
 
-  return Number(roi.toFixed(2)); // consistent output
+  return Number(roi.toFixed(2));
 }
 
 export function computePriorityWeight(priority: Task['priority']): 3 | 2 | 1 {
@@ -30,12 +28,12 @@ export function computePriorityWeight(priority: Task['priority']): 3 | 2 | 1 {
 export function withDerived(task: Task): DerivedTask {
   return {
     ...task,
-    roi: computeROI(task.revenue, task.timeTaken),       // ⭐ now safe
+    roi: computeROI(task.revenue, task.timeTaken),
     priorityWeight: computePriorityWeight(task.priority),
   };
 }
 
-// ⭐ FIXED: STABLE SORTING (Bug 3)
+// Stable sorting: ROI → Priority → Title
 export function sortTasks(tasks: DerivedTask[]) {
   const priorityOrder: Record<string, number> = {
     High: 3,
@@ -44,21 +42,20 @@ export function sortTasks(tasks: DerivedTask[]) {
   };
 
   return tasks.sort((a, b) => {
-    // 1️⃣ Primary: ROI
     if (b.roi !== a.roi) return b.roi - a.roi;
 
-    // 2️⃣ Secondary: Priority
     if (priorityOrder[b.priority] !== priorityOrder[a.priority]) {
       return priorityOrder[b.priority] - priorityOrder[a.priority];
     }
 
-    // 3️⃣ Stable tie-break: Alphabetical title
     return a.title.localeCompare(b.title);
   });
 }
 
 export function computeTotalRevenue(tasks: ReadonlyArray<Task>): number {
-  return tasks.filter(t => t.status === 'Done').reduce((sum, t) => sum + t.revenue, 0);
+  return tasks
+    .filter(t => t.status === 'Done')
+    .reduce((sum, t) => sum + t.revenue, 0);
 }
 
 export function computeTotalTimeTaken(tasks: ReadonlyArray<Task>): number {
@@ -85,7 +82,7 @@ export function computeAverageROI(tasks: ReadonlyArray<Task>): number {
   if (rois.length === 0) return 0;
 
   const avg = rois.reduce((s, r) => s + r, 0) / rois.length;
-  return Number(avg.toFixed(2)); // ⭐ clean decimals
+  return Number(avg.toFixed(2));
 }
 
 export function computePerformanceGrade(avgROI: number): 'Excellent' | 'Good' | 'Needs Improvement' {
@@ -95,16 +92,37 @@ export function computePerformanceGrade(avgROI: number): 'Excellent' | 'Good' | 
 }
 
 // ---- Advanced analytics ----
-export type FunnelCounts = { todo: number; inProgress: number; done: number; conversionTodoToInProgress: number; conversionInProgressToDone: number };
+
+export type FunnelCounts = {
+  todo: number;
+  inProgress: number;
+  done: number;
+  conversionTodoToInProgress: number;
+  conversionInProgressToDone: number;
+};
 
 export function computeFunnel(tasks: ReadonlyArray<Task>): FunnelCounts {
   const todo = tasks.filter(t => t.status === 'Todo').length;
   const inProgress = tasks.filter(t => t.status === 'In Progress').length;
   const done = tasks.filter(t => t.status === 'Done').length;
+
   const baseTodo = todo + inProgress + done;
-  const conversionTodoToInProgress = baseBase ? (inProgress + done) / baseTodo : 0;
-  const conversionInProgressToDone = inProgress ? done / inProgress : 0;
-  return { todo, inProgress, done, conversionTodoToInProgress, conversionInProgressToDone };
+
+  const conversionTodoToInProgress = baseTodo
+    ? (inProgress + done) / baseTodo
+    : 0;
+
+  const conversionInProgressToDone = inProgress
+    ? done / inProgress
+    : 0;
+
+  return {
+    todo,
+    inProgress,
+    done,
+    conversionTodoToInProgress,
+    conversionInProgressToDone,
+  };
 }
 
 export function daysBetween(aISO: string, bISO: string): number {
@@ -138,6 +156,7 @@ export function computeVelocityByPriority(tasks: ReadonlyArray<Task>): Record<Ta
 
 export function computeThroughputByWeek(tasks: ReadonlyArray<Task>): Array<{ week: string; count: number; revenue: number }> {
   const byWeek = new Map<string, { count: number; revenue: number }>();
+
   tasks.forEach(t => {
     if (!t.completedAt) return;
     const d = new Date(t.completedAt);
@@ -147,6 +166,7 @@ export function computeThroughputByWeek(tasks: ReadonlyArray<Task>): Array<{ wee
     v.revenue += t.revenue;
     byWeek.set(weekKey, v);
   });
+
   return Array.from(byWeek.entries())
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([week, v]) => ({ week, ...v }));
@@ -168,21 +188,28 @@ export function computeWeightedPipeline(tasks: ReadonlyArray<Task>): number {
 
 export function computeForecast(weekly: Array<{ week: string; revenue: number }>, horizonWeeks = 4): Array<{ week: string; revenue: number }> {
   if (weekly.length < 2) return [];
+
   const y = weekly.map(w => w.revenue);
   const x = weekly.map((_, i) => i);
   const n = x.length;
+
   const sumX = x.reduce((s, v) => s + v, 0);
   const sumY = y.reduce((s, v) => s + v, 0);
   const sumXY = x.reduce((s, v, i) => s + v * y[i], 0);
   const sumXX = x.reduce((s, v) => s + v * v, 0);
+
   const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX || 1);
   const intercept = (sumY - slope * sumX) / n;
+
   const lastIndex = x[x.length - 1];
+
   const result: Array<{ week: string; revenue: number }> = [];
+
   for (let i = 1; i <= horizonWeeks; i++) {
     const idx = lastIndex + i;
     result.push({ week: `+${i}`, revenue: Math.max(0, slope * idx + intercept) });
   }
+
   return result;
 }
 
