@@ -1,8 +1,25 @@
 import { useMemo, useState } from 'react';
-import { Box, Button, Card, CardContent, IconButton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  IconButton,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography
+} from '@mui/material';
+
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+
 import { DerivedTask, Task } from '@/types';
 import TaskForm from '@/components/TaskForm';
 import TaskDetailsDialog from '@/components/TaskDetailsDialog';
@@ -45,7 +62,9 @@ export default function TaskTable({ tasks, onAdd, onUpdate, onDelete }: Props) {
       <CardContent>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
           <Typography variant="h6" fontWeight={700}>Tasks</Typography>
-          <Button startIcon={<AddIcon />} variant="contained" onClick={handleAddClick}>Add Task</Button>
+          <Button startIcon={<AddIcon />} variant="contained" onClick={handleAddClick}>
+            Add Task
+          </Button>
         </Stack>
 
         <TableContainer sx={{ maxHeight: 520 }}>
@@ -73,6 +92,7 @@ export default function TaskTable({ tasks, onAdd, onUpdate, onDelete }: Props) {
                   <TableCell>
                     <Stack spacing={0.5}>
                       <Typography fontWeight={600}>{t.title}</Typography>
+
                       {t.notes && (
                         <Typography
                           variant="caption"
@@ -93,8 +113,6 @@ export default function TaskTable({ tasks, onAdd, onUpdate, onDelete }: Props) {
 
                   <TableCell align="right">
                     <Stack direction="row" spacing={1} justifyContent="flex-end">
-
-                      {/* ⭐ FIXED: stop row click on Edit */}
                       <Tooltip title="Edit">
                         <IconButton
                           onClick={(e) => {
@@ -107,7 +125,6 @@ export default function TaskTable({ tasks, onAdd, onUpdate, onDelete }: Props) {
                         </IconButton>
                       </Tooltip>
 
-                      {/* ⭐ FIXED: stop row click on Delete */}
                       <Tooltip title="Delete">
                         <IconButton
                           onClick={(e) => {
@@ -120,7 +137,6 @@ export default function TaskTable({ tasks, onAdd, onUpdate, onDelete }: Props) {
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-
                     </Stack>
                   </TableCell>
                 </TableRow>
