@@ -1,6 +1,7 @@
 # Task Glitch – Bug Fix Submission (Full Stack Development Intern Assignment)
 
 **Live Demo:** https://kevinjustees-taskglitch.netlify.app/
+
 **GitHub Repository:** https://github.com/KevinJustees/task-glitch-fixed
 
 This project is my completed submission for the **Full Stack Development Intern – SDE Assignment**, where I was required to fix 5 critical bugs in a Task Management Web App.  
