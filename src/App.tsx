@@ -1,3 +1,18 @@
+import { 
+  useState, 
+  useCallback, 
+  useMemo 
+} from "react";
+
+import { Box, Container, Stack } from "@mui/material";
+
+import { useTasksContext } from "@/context/TasksContext";
+import { useUser } from "@/hooks/useUser";
+
+import UndoSnackbar from "@/components/UndoSnackbar";
+
+import { Task, ActivityItem } from "@/types";
+
 function AppContent() {
   const { 
     loading, 
