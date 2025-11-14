@@ -23,7 +23,7 @@ interface UseTasksState {
   updateTask: (id: string, patch: Partial<Task>) => void;
   deleteTask: (id: string) => void;
   undoDelete: () => void;
-  clearLastDeleted: () => void;   // ⭐ added here
+  clearLastDeleted: () => void;   //  added here
 }
 
 const INITIAL_METRICS: Metrics = {
